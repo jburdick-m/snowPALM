@@ -1,0 +1,10 @@
+name: snowpalm
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10,<3.13
+  - numpy
+  - scipy
+  - netcdf4
+  - gdal
+  - pip

@@ -1,0 +1,7 @@
+# GDAL via pip needs the system libgdal-dev installed first, and the
+# pip GDAL version must match the system libgdal version exactly.
+# If install fails, use environment.yml with conda instead.
+numpy
+scipy
+netCDF4
+GDAL

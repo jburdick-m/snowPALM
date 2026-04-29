@@ -1,2 +1,19 @@
 *.zip
 *.crdownload
+
+# Python environments (built locally from environment.yml / requirements.txt)
+.venv/
+venv/
+env/
+.conda/
+.python-version
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor / OS cruft
+.vscode/
+.idea/
+.DS_Store
