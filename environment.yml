@@ -7,4 +7,7 @@ dependencies:
   - scipy
   - netcdf4
   - gdal
+  - pyproj
+  - pillow
+  - python-dateutil
   - pip
