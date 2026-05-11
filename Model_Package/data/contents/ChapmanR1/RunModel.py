@@ -1,5 +1,6 @@
 import sys
 import os
+from pathlib import Path
 # Add the SnowPALM_model directory (sibling of this script's parent) to sys.path
 # so `import Forcing` picks up the maintained module, not a stale copy elsewhere.
 if "__file__" in globals():
@@ -30,7 +31,9 @@ program_pars['ReinitializeModel'] = False               # Reinitialize Model? (C
 program_pars['OverwriteForcing'] = False                # Overwrite preprocessing forcing files?
 program_pars['OverwriteIndexes'] = False                # Overwrite preprocessing index files?
 
-program_pars['NProcesses'] = 60                         # Maximum Number of processes used for multiprocessing
+program_pars['NProcesses'] = 8                          # Maximum Number of processes used for multiprocessing.
+                                                        # Set to roughly your CPU core count. The author's original 60
+                                                        # assumes a 60+ core machine; bump up on a beefy VM.
 program_pars['CreatePyramids'] = False
 
 if program_pars['SimulationName'] == 'EntireArea_Daily_2017':
@@ -237,6 +240,17 @@ elif program_pars['SimulationName'] == 'POIs_Hourly3':
     program_pars['POIDir'] = 'InputData/POIs'                       # POI directory
     program_pars['UseWindModel'] = True                             # Use Wind Model
     #model_pars['q_phreatic_i'] = os.getcwd() + '/Preprocess/GIS/DTM.tif'
+
+elif program_pars['SimulationName'] == 'ChapmanR1_WY2025_Daily':
+
+    program_pars['ForcingSetName'] = 'DailyNLDASData2'              # Pure NLDAS + PRISM (no station data)
+    program_pars['ModelTimestep'] = 1                               # 0: Hourly, 1: Daily
+    program_pars['UseHourlySFIFiles'] = False                       # Use hourly solar forcing files (only for hourly model)
+    program_pars['StartDate'] = date(2024, 10, 1)                   # Water Year 2025
+    program_pars['EndDate'] = date(2025, 9, 30)
+    program_pars['SimulationType'] = 0                              # 0: Entire Area, 1: Subset Area, 2: POIs only
+    program_pars['MaxChunkSize'] = 25000                            # Maximum size (in pixels) of each model chunk
+    program_pars['UseWindModel'] = True
 
 # Output Variables
 #                            Variable Name                      Short Name (in code)    Units

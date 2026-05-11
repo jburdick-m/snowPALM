@@ -1,5 +1,6 @@
 import sys
 import os
+from pathlib import Path
 # Add the SnowPALM_model directory (sibling of this script's parent) to sys.path
 # so `import Forcing` picks up the maintained module, not a stale copy elsewhere.
 if "__file__" in globals():
@@ -41,11 +42,11 @@ pars['PYRAMIDS'] = 0                                            # Elevation Aver
 
 # Wind Index Parameters
 
-pars['StartYear'] = 2016                    # Start Year
+pars['StartYear'] = 2024                    # Start Year
 pars['StartMonth'] = 10                     # Start Month
-pars['EndYear'] = 2022                      # End Year
+pars['EndYear'] = 2025                      # End Year
 pars['EndMonth'] = 9                        # End Month
-pars['ForcingSet'] = 'DailyNLDASData'
+pars['ForcingSet'] = 'DailyNLDASData2'
 # Forcing set used to create wind index maps (wind direction, as well as precipitation and temperature thresholds could be used)
 
 pars['IncludeAllDays'] = False              # Whether to create a wind map each day regardless of whether there is snowfall
