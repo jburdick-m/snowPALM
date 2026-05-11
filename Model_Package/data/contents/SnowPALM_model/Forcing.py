@@ -37,10 +37,10 @@ def exec_cmd(cmd, Verbose):
 
 
 def ReadRaster(fname, Verbose):
-    
+
     if Verbose:
         print('Reading ' + fname)
-        
+
     ds = gdal.Open(fname, GA_ReadOnly)
     if ds is None:
         print('Could not open ' + fname)
@@ -48,8 +48,78 @@ def ReadRaster(fname, Verbose):
     Data = ds.ReadAsArray().astype(float)
     Data[Data == nodataval] = np.nan
     ds = None
-    
+
     return Data
+
+
+# NLDAS-2 v2.0 NetCDF reader. NASA stopped distributing GRIB-1 NLDAS-2 on
+# 2024-08-01 and re-archived everything as NetCDF-4. Variable mapping below
+# preserves the band indices the rest of GetForcingData expects from the old
+# GRIB reader: [0]=Tair, [1]=Qair, [2]=PSurf, [3]=Wind_E, [4]=Wind_N,
+# [5]=LWdown, [6,7]=unused, [8]=PotEvap, [9]=Rainf, [10]=SWdown.
+_NLDAS_VAR_ORDER = [
+    "Tair", "Qair", "PSurf", "Wind_E", "Wind_N", "LWdown",
+    None, None,                       # CRainf_frac, CAPE not consumed downstream
+    "PotEvap", "Rainf", "SWdown",
+]
+
+def _read_nldas_netcdf(fname, tr, te, prj, resampling_method, tmp_dir, Verbose):
+    """Read an NLDAS-2 v2.0 NetCDF (.nc) hourly file and return a
+    (11, rows, cols) float array with the band ordering above.
+
+    Precip (Rainf) is converted from kg/m^2/s -> kg/m^2/hr (mm/hr) so it
+    matches what the old GRIB APCP delivered. PotEvap stays in NetCDF
+    units (W/m^2)."""
+
+    if not os.path.exists(fname):
+        print('Could not open ' + fname)
+        sys.exit(1)
+
+    ulx, lry, lrx, uly = (float(v) for v in te.split())
+    xres, yres = (float(v) for v in tr.split())
+
+    # Read one variable just to learn the output grid shape.
+    first_tmp = os.path.join(tmp_dir, 'tmp_NLDAS_probe.tif')
+    gdal.Warp(
+        first_tmp, f'NETCDF:"{fname}":Tair',
+        format='GTiff',
+        xRes=abs(xres), yRes=abs(yres),
+        outputBounds=[ulx, lry, lrx, uly],
+        dstSRS=prj,
+        resampleAlg=resampling_method,
+        multithread=True,
+    )
+    first_band = ReadRaster(first_tmp, Verbose)
+    if first_band.ndim == 3:
+        first_band = first_band[0]
+    rows, cols = first_band.shape
+
+    data = np.zeros((11, rows, cols)) * np.nan
+    data[0, :, :] = first_band
+    os.remove(first_tmp)
+
+    for band_idx, varname in enumerate(_NLDAS_VAR_ORDER):
+        if varname is None or band_idx == 0:
+            continue
+        tmp = os.path.join(tmp_dir, f'tmp_NLDAS_{varname}.tif')
+        gdal.Warp(
+            tmp, f'NETCDF:"{fname}":{varname}',
+            format='GTiff',
+            xRes=abs(xres), yRes=abs(yres),
+            outputBounds=[ulx, lry, lrx, uly],
+            dstSRS=prj,
+            resampleAlg=resampling_method,
+            multithread=True,
+        )
+        band = ReadRaster(tmp, Verbose)
+        if band.ndim == 3:
+            band = band[0]
+        data[band_idx, :, :] = band
+        os.remove(tmp)
+
+    # kg/m^2/s -> kg/m^2/hr (i.e. mm/hr) to match old GRIB APCP
+    data[9, :, :] = data[9, :, :] * 3600.0
+    return data
 
 def GetGeorefInfo(fname):
     ds = gdal.Open(fname, GA_ReadOnly)
@@ -349,13 +419,9 @@ def GetForcingData(pars):
             
             # Get NLDAS data
             if pars['DataSource'] == 0 or pars['FillWithNLDAS']:
-                fname = pars['NLDASForcingDir'] + '/' + yyyy + '/' + ddd + '/NLDAS_FORA0125_H.A' + yyyy + mm + dd + '.' + hh + '00.002.grb'
+                fname = pars['NLDASForcingDir'] + '/' + yyyy + '/' + ddd + '/NLDAS_FORA0125_H.A' + yyyy + mm + dd + '.' + hh + '00.020.nc'
                 print('Reading ' + fname)
-                tmpfilename = tmp_dir.name + '/tmp_NLDAS.tif'
-                cmd = 'gdalwarp -tr ' + tr + ' -te ' + te + ' -multi -r ' + pars['NLDASResamplingMethod'] + ' -overwrite -t_srs "' + prj + '" "' + fname + '" "' + tmpfilename + '"'
-                exec_cmd(cmd, pars['Verbose'])
-                data = ReadRaster(tmpfilename, pars['Verbose'])
-                os.remove(tmpfilename)
+                data = _read_nldas_netcdf(fname, tr, te, prj, pars['NLDASResamplingMethod'], tmp_dir.name, pars['Verbose'])
 
                 airt[c,:,:] = data[0,:,:]
                 pres[c,:,:] = data[2,:,:]
@@ -427,23 +493,16 @@ def GetForcingData(pars):
                 if len(mm) < 2:
                     mm = '0' + mm
 
-                fname1 = pars['PRISMForcingDir'] + '/ppt/' + yyyy + '/PRISM_ppt_stable_4kmM' + str(pars['prism_ppt_version']) + '_' + yyyy + mm + '_bil.zip';
-                fname2 = pars['PRISMForcingDir'] + '/ppt/' + yyyy + '/PRISM_ppt_provisional_4kmM' + str(pars['prism_ppt_version']) + '_' + yyyy + mm + '_bil.zip';
+                fname1 = pars['PRISMForcingDir'] + '/ppt/' + yyyy + '/prism_ppt_us_25m_' + yyyy + mm + '.zip';
                 tmpfilename = tmp_dir.name + '/tmp_PRISM.tif'
 
                 if os.path.exists(fname1):
                     print('Reading ' + fname1)
                     cmd = 'gdal_translate  -projwin ' + projwin + ' "/vsizip/' + fname1 + '/' + os.path.basename(fname1).replace('.zip','.bil') + '" "' + tmpfilename + '"'
-                    exec_cmd(cmd, pars['Verbose']) 
-                    PRISM_ppt = ReadRaster(tmpfilename, pars['Verbose'])
-
-                elif os.path.exists(fname2):
-                    print('Reading ' + fname2)
-                    cmd = 'gdal_translate  -projwin ' + projwin + ' "/vsizip/' + fname2 + '/' + os.path.basename(fname2).replace('.zip','.bil') + '" "' + tmpfilename + '"'
                     exec_cmd(cmd, pars['Verbose'])
                     PRISM_ppt = ReadRaster(tmpfilename, pars['Verbose'])
                 else:
-                    print(fname1 + ' and ' + fname2 + ' do not exist!!! Download data first')
+                    print(fname1 + ' does not exist!!! Download data first')
                     sys.exit()
 
                 if 'PRISM_DTM' not in locals():
@@ -513,23 +572,16 @@ def GetForcingData(pars):
                 if len(mm) < 2:
                     mm = '0' + mm
 
-                fname1 = pars['PRISMForcingDir'] + '/tmean/' + yyyy + '/PRISM_tmean_stable_4kmM' + str(pars['prism_tmean_version']) + '_' + yyyy + mm + '_bil.zip';
-                fname2 = pars['PRISMForcingDir'] + '/tmean/' + yyyy + '/PRISM_tmean_provisional_4kmM' + str(pars['prism_tmean_version']) + '_' + yyyy + mm + '_bil.zip';
+                fname1 = pars['PRISMForcingDir'] + '/tmean/' + yyyy + '/prism_tmean_us_25m_' + yyyy + mm + '.zip';
                 tmpfilename = tmp_dir.name + '/tmp_PRISM.tif'
 
                 if os.path.exists(fname1):
                     print('Reading ' + fname1)
                     cmd = 'gdal_translate  -projwin ' + projwin + ' "/vsizip/' + fname1 + '/' + os.path.basename(fname1).replace('.zip','.bil') + '" "' + tmpfilename + '"'
-                    exec_cmd(cmd, pars['Verbose']) 
-                    PRISM_tmean = ReadRaster(tmpfilename, pars['Verbose'])
-
-                elif os.path.exists(fname2):
-                    print('Reading ' + fname2)
-                    cmd = 'gdal_translate  -projwin ' + projwin + ' "/vsizip/' + fname2 + '/' + os.path.basename(fname2).replace('.zip','.bil') + '" "' + tmpfilename + '"'
                     exec_cmd(cmd, pars['Verbose'])
                     PRISM_tmean = ReadRaster(tmpfilename, pars['Verbose'])
                 else:
-                    print(fname1 + ' and ' + fname2 + ' do not exist!!! Download data first')
+                    print(fname1 + ' does not exist!!! Download data first')
                     sys.exit()
                   
                 if 'PRISM_DTM' not in locals():
