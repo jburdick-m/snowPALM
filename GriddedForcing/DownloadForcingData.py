@@ -64,12 +64,12 @@ except ImportError:
 
 # Water Year 2025 = Oct 2024 -> Sep 2025
 START_YEAR, START_MONTH = 2024, 10
-END_YEAR,   END_MONTH   = 2025, 9
+END_YEAR,   END_MONTH   = 2024, 10
 
 PRISM_BASE = "https://services.nacse.org/prism/data/get/us/4km"
 NLDAS_BASE = "https://hydro1.gesdisc.eosdis.nasa.gov/data/NLDAS/NLDAS_FORA0125_H.2.0"
 
-EARTHDATA_TOKEN    = os.environ.get("EARTHDATA_TOKEN", "")
+EARTHDATA_TOKEN    = os.environ.get("EARTHDATA_TOKEN", "eyJ0eXAiOiJKV1QiLCJvcmlnaW4iOiJFYXJ0aGRhdGEgTG9naW4iLCJzaWciOiJlZGxqd3RwdWJrZXlfb3BzIiwiYWxnIjoiUlMyNTYifQ.eyJ0eXBlIjoiVXNlciIsInVpZCI6ImpidXJkaWNrIiwiZXhwIjoxNzgzNzE2NjM2LCJpYXQiOjE3Nzg1MzI2MzYsImlzcyI6Imh0dHBzOi8vdXJzLmVhcnRoZGF0YS5uYXNhLmdvdiIsImlkZW50aXR5X3Byb3ZpZGVyIjoiZWRsX29wcyIsImFjciI6ImVkbCIsImFzc3VyYW5jZV9sZXZlbCI6M30.UwHWhTLJMiKjZis0bCc1TRPmGySAuCQd1BZcT0I-AhT27sCcH0No_uUoN39OQ8PHFLHdzcqB61ztnJv5KqoC9VldolltZzzUg8zOTNNbMEp-FbnjKywK_lKrGNsO5xEooY8P4etKw0PhiCChozkewaQ3WYr5W5CT9vOG9hWzQ94VwEKZa6S0Mi2qnbZQCNfjGKbse-0Isbvdsf6dlSVkBvqeY7S4HWNCTqCSIIZ5lbT--iSwpy4Pll-SXCr3oFG8PwmZHTY6dwC_vUspMdmfEVlFn3VsMJDkbj9N-XVoFvNB5vyIFrTnrqQdFTsHwW18diwxhjDejd1tU6evjM2YbA")
 EARTHDATA_USERNAME = os.environ.get("EARTHDATA_USERNAME", "")
 EARTHDATA_PASSWORD = os.environ.get("EARTHDATA_PASSWORD", "")
 

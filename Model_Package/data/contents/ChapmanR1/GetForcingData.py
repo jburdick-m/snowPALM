@@ -21,7 +21,7 @@ pars['Verbose'] = False                                # Verbose output
 #pars['GriddedForcingDir'] = r'Z:\GriddedForcing'  # Directory containing gridded forcing data
 
 #pars['GriddedForcingDir'] = '../../GriddedForcing'     # Directory containing gridded forcing data
-pars['GriddedForcingDir'] = r'D:\data\Python SnowPALM\GriddedForcing'     # Directory containing gridded forcing data
+pars['GriddedForcingDir'] = r'C:\Users\jburdick\Documents\Python Scripts\git\snowPALM\GriddedForcing'     # Directory containing gridded forcing data
 
 #    'GriddedForcing'     # Directory containing gridded forcing data
 

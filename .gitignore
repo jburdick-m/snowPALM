@@ -1,11 +1,12 @@
-# Ignore common temporary/build files
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.ipynb_checkpoints/
-.vscode/
+  # Ignore everything by default
+  *
 
-# Ensure all .py and .txt files are tracked
-!*.py
-!*.txt
+  # Re-include directories so git can recurse into them
+  !*/
+
+  # Allow these file types
+  !*.py
+  !*.txt
+
+  # Allow .gitignore itself
+  !.gitignore

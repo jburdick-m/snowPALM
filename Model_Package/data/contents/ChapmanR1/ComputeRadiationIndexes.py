@@ -53,7 +53,7 @@ if __name__ == '__main__':
 # Potential solar radiation parameters (see https://saga-gis.sourceforge.io/saga_tool_doc/2.2.2/ta_lighting_2.html)
 
 pars['Solar_output_step'] = 1                                   # 0: hourly solar maps 1: daily solar maps
-pars['Solar_hour_step'] = 0.25                                  # Time step for SFI calculation [h]
+pars['Solar_hour_step'] = 0.5                                  # Time step for SFI calculation [h]
 pars['Solar_Months'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]  # Months to compute SFI for
 pars['Solar_Days'] = [1]                                        # Days in Months to compute SFI for
 pars['ConstantLatitude'] = True                                 # Set this to True to speed up processing for small areas
