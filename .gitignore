@@ -1,3 +1,9 @@
 *.zip
 *.crdownload
-Model_Package/
+Model_Package/*
+!Model_Package/data/
+Model_Package/data/*
+!Model_Package/data/contents/
+Model_Package/data/contents/*
+!Model_Package/data/contents/ChapmanR1/
+!Model_Package/data/contents/ChapmanR1/*.py
