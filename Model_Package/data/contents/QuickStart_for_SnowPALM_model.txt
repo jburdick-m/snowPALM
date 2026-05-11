@@ -1,0 +1,50 @@
+Step 1: Extract spatial data from the raw data files for the model domain (Double click GetSpatialData.bat)
+  
+In addition to extracting DTM, cover, and veght maps from the input data files, it also creates a map of leaf area index.  
+Output files are saved in Preprocess/GIS (extracted dtm, cover, and veght maps) and Preprocess/Indexes (lai map).
+Note that unless specified, this scrip only (re)creates files that are not present
+
+Step 2: Create skyview and potential solar forcing index (SFI) maps (Double click ComputeRadiationIndexes.bat)
+
+This script creates a single skyview factor map but potential solar index maps for every month.  All maps are created using
+SAGA GIS algorithms, though they are created separately for different classes of canopy cover (so shadows / skyview from
+sparse vegetation can be treated differently from those from dense vegetation).  The SAGA created maps are saved in 
+Preprocess/GIS and the final Skyview and SFI maps are saved in Preprocess/Indexes.
+Note that unless specified, this scrip only (re)creates files that are not present
+
+Step 3: Extract forcing data to the model domain (Double click GetForcingData.bat)
+
+Forcing data can either come from NLDAS/PRISM and/or from a prescribed forcing data
+file.  There are options to use daily or hourly forcing data, different variables can come from different sources, and lapse
+rates can be applied.  Files are saved in Preprocess/Forcing
+Note that this script always recreates files specified
+
+    To use the PRISM/NLDAS data, these data have to be downloaded first, which can be done by double clicking 
+    GriddedForcing/DownloadForcingData.bat.  It is recommended to have the GriddedForcing in a place that can be used for multiple 
+    SnowPALM domains (currently I have one in D:\data\SnowPALM\PyPALM\GriddedForcing)
+
+    OutputForcingData.bat can also be used to export SnowPALM's forcing data for a point (which creates a csv file in Output\Forcing_csv)
+
+    Remember to update the desired dates in GetForcingData.bat, DownloadForcingData.bat, and OutputForcingData.bat
+
+Step 4: Create wind index maps for the model domain (Double click ComputeWindIndexes.bat)
+
+Wind index maps are created for each day with non zero precipitation below a certain temperature threshold.  Different maps are created 
+based on different daily wind directions (though the wind direction for all maps can also be forced to be consistent as well.  Files are
+saved in Preprocess/Indexes (though files that are direct outputs from GIS algorithms are also saved in Preprocess/GIS
+Note that unless specified, this scrip only (re)creates files that are not present
+
+Step 5: Run SnowPALM (Double click RunModel.bat)
+
+Will first create a 2d model structure (spatial dimension and time dimension) for each tile.  This structure will then be populated with
+extractd forcing data and indexes (from the preprocessors).  Note that this step only needs to be completed once, and makes subsequent
+model runs much faster.  The model can either be run for the entire model domain (whole extent of preprocessed files), a subset of this area,
+or for a series of points (defined in the shapefiles in the POIs Directory).  For spatial domains, the model runs on individual tiles in 
+paralell.  Temporal output is automatically generated when running in point mode (saved to Output/POIs).  Spatial output needs to be output with OutputGriddedData.bat
+
+Step 6: Output Gridded Model Data (Double click OutputGriddedData.bat)
+
+Aggregates together the individual model tiles and creates GIS data files.  In the bat file, you need to specify the domain, date range, 
+and output variables to extract.
+
+

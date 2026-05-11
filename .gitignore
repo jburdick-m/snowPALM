@@ -1,9 +1,11 @@
-*.zip
-*.crdownload
-Model_Package/*
-!Model_Package/data/
-Model_Package/data/*
-!Model_Package/data/contents/
-Model_Package/data/contents/*
-!Model_Package/data/contents/ChapmanR1/
-!Model_Package/data/contents/ChapmanR1/*.py
+# Ignore common temporary/build files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+.vscode/
+
+# Ensure all .py and .txt files are tracked
+!*.py
+!*.txt
