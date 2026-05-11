@@ -35,10 +35,18 @@ ONE-TIME SETUP
    "NASA GESDISC DATA ARCHIVE" application authorized.
 
 2. Generate an Earthdata User Token (sign in -> User Tokens -> Generate).
-   Set it in the same shell you launch python from:
+   Provide the token to the script in one of two ways:
 
-       set EARTHDATA_TOKEN=<your-long-token-string>          (Windows cmd)
-       $env:EARTHDATA_TOKEN = "<your-long-token-string>"     (PowerShell)
+   (a) RECOMMENDED. Put the token in a local file next to this script:
+           GriddedForcing/earthdata_token.local
+       containing nothing but the token string on one line. The repo's
+       .gitignore prevents *.local files from being committed.
+
+   (b) Or set it in your shell session before running python:
+           set EARTHDATA_TOKEN=<token>           (Windows cmd)
+           $env:EARTHDATA_TOKEN = "<token>"      (PowerShell)
+
+   Never paste the token directly into this script.
 
 USAGE
 -----
@@ -69,7 +77,21 @@ END_YEAR,   END_MONTH   = 2024, 10
 PRISM_BASE = "https://services.nacse.org/prism/data/get/us/4km"
 NLDAS_BASE = "https://hydro1.gesdisc.eosdis.nasa.gov/data/NLDAS/NLDAS_FORA0125_H.2.0"
 
-EARTHDATA_TOKEN    = os.environ.get("EARTHDATA_TOKEN", "eyJ0eXAiOiJKV1QiLCJvcmlnaW4iOiJFYXJ0aGRhdGEgTG9naW4iLCJzaWciOiJlZGxqd3RwdWJrZXlfb3BzIiwiYWxnIjoiUlMyNTYifQ.eyJ0eXBlIjoiVXNlciIsInVpZCI6ImpidXJkaWNrIiwiZXhwIjoxNzgzNzE2NjM2LCJpYXQiOjE3Nzg1MzI2MzYsImlzcyI6Imh0dHBzOi8vdXJzLmVhcnRoZGF0YS5uYXNhLmdvdiIsImlkZW50aXR5X3Byb3ZpZGVyIjoiZWRsX29wcyIsImFjciI6ImVkbCIsImFzc3VyYW5jZV9sZXZlbCI6M30.UwHWhTLJMiKjZis0bCc1TRPmGySAuCQd1BZcT0I-AhT27sCcH0No_uUoN39OQ8PHFLHdzcqB61ztnJv5KqoC9VldolltZzzUg8zOTNNbMEp-FbnjKywK_lKrGNsO5xEooY8P4etKw0PhiCChozkewaQ3WYr5W5CT9vOG9hWzQ94VwEKZa6S0Mi2qnbZQCNfjGKbse-0Isbvdsf6dlSVkBvqeY7S4HWNCTqCSIIZ5lbT--iSwpy4Pll-SXCr3oFG8PwmZHTY6dwC_vUspMdmfEVlFn3VsMJDkbj9N-XVoFvNB5vyIFrTnrqQdFTsHwW18diwxhjDejd1tU6evjM2YbA")
+def _load_earthdata_token():
+    """Return the Earthdata bearer token, checking (in order):
+    1. EARTHDATA_TOKEN environment variable
+    2. earthdata_token.local file in the same folder as this script
+    Returns "" if neither is set."""
+    env_value = os.environ.get("EARTHDATA_TOKEN", "").strip()
+    if env_value:
+        return env_value
+    token_file = Path(__file__).resolve().parent / "earthdata_token.local"
+    if token_file.exists():
+        return token_file.read_text(encoding="utf-8").strip()
+    return ""
+
+
+EARTHDATA_TOKEN    = _load_earthdata_token()
 EARTHDATA_USERNAME = os.environ.get("EARTHDATA_USERNAME", "")
 EARTHDATA_PASSWORD = os.environ.get("EARTHDATA_PASSWORD", "")
 

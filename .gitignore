@@ -10,3 +10,11 @@
 
   # Allow .gitignore itself
   !.gitignore
+
+  # Belt and suspenders: never track credentials even if they slip through
+  *.local
+  *.secret
+  credentials*
+  *token*.txt
+  *.pem
+  *.key
