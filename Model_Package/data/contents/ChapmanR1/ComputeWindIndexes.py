@@ -1,6 +1,14 @@
 import sys
 import os
-sys.path.insert(1, 'ProgramFiles')
+# Add the SnowPALM_model directory (sibling of this script's parent) to sys.path
+# so `import Forcing` picks up the maintained module, not a stale copy elsewhere.
+if "__file__" in globals():
+    current_file_dir = Path(__file__).resolve().parent
+target_path = current_file_dir.parent / "SnowPALM_model"
+if target_path.exists() and str(target_path) not in sys.path:
+    sys.path.insert(1, str(target_path))
+else:
+    print(f"Path already in sys.path or directory not found: {target_path}")
 import GIS
 import Indexes
 pars = {}
@@ -10,7 +18,7 @@ pars = {}
 pars['Verbose'] = False                          # Verbose output
 pars['Overwrite'] = True                        # Overwrite Files?
 pars['CreatePyramids'] = False                   # Create pyramids for faster display
-pars['SagaGISLoc'] = r'C:\saga-8.2.0_x64'        # Location of Saga GIS Executable
+pars['SagaGISLoc'] = r'C:\Users\jburdick\saga-9.12.2_msw'        # Location of Saga GIS Executable
 
 # Compute all indexes for different classes individually, and adjust indexes according to canopy thickness (move to separate program)
 pars['VegCoverCategories'] = [[80, 100], [60, 80], [40, 60], [20, 40], [0, 20]] 

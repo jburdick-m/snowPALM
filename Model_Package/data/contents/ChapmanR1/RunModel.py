@@ -1,6 +1,14 @@
 import sys
 import os
-sys.path.insert(1, 'ProgramFiles')
+# Add the SnowPALM_model directory (sibling of this script's parent) to sys.path
+# so `import Forcing` picks up the maintained module, not a stale copy elsewhere.
+if "__file__" in globals():
+    current_file_dir = Path(__file__).resolve().parent
+target_path = current_file_dir.parent / "SnowPALM_model"
+if target_path.exists() and str(target_path) not in sys.path:
+    sys.path.insert(1, str(target_path))
+else:
+    print(f"Path already in sys.path or directory not found: {target_path}")
 from datetime import date
 import Initialize
 import Model
