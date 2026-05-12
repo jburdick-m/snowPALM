@@ -684,12 +684,22 @@ def get_forcing_data(TileName, ForcingFName, IndexFName, model_pars, program_par
         x = Shortwave[:, 0]
         if program_pars['ModelTimestep'] == 0:
             peaks, _ = find_peaks(x, distance=360)
+            if len(peaks) == 0:
+                # Short series or no clear-sky maxima >= 15 days apart;
+                # fall back to the single highest hour as the envelope.
+                peaks = np.array([int(np.argmax(x))])
             PotentialShortwave_max = np.interp(range(nt), peaks, x[peaks])
             peaks, _ = find_peaks(x)
+            if len(peaks) == 0:
+                peaks = np.array([int(np.argmax(x))])
             PotentialShortwave_actual = np.interp(range(nt), peaks, x[peaks])
             CF[:,i] = PotentialShortwave_actual/PotentialShortwave_max
         elif program_pars['ModelTimestep'] == 1:
             peaks, _ = find_peaks(x, distance=15)
+            if len(peaks) == 0:
+                # Short series (e.g. a 1-month test) or monotonic shortwave;
+                # fall back to the single max day as the envelope.
+                peaks = np.array([int(np.argmax(x))])
             PotentialShortwave_max = np.interp(range(nt), peaks, x[peaks])
             CF[:,i] = Shortwave[:,i]/PotentialShortwave_max
             
