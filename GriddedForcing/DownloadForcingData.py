@@ -72,7 +72,7 @@ except ImportError:
 
 # Water Year 2025 = Oct 2024 -> Sep 2025
 START_YEAR, START_MONTH = 2024, 10
-END_YEAR,   END_MONTH   = 2024, 10
+END_YEAR,   END_MONTH   = 2025, 10
 
 PRISM_BASE = "https://services.nacse.org/prism/data/get/us/4km"
 NLDAS_BASE = "https://hydro1.gesdisc.eosdis.nasa.gov/data/NLDAS/NLDAS_FORA0125_H.2.0"
@@ -95,7 +95,7 @@ EARTHDATA_TOKEN    = _load_earthdata_token()
 EARTHDATA_USERNAME = os.environ.get("EARTHDATA_USERNAME", "")
 EARTHDATA_PASSWORD = os.environ.get("EARTHDATA_PASSWORD", "")
 
-MAX_WORKERS    = 16    # NLDAS parallel downloads
+MAX_WORKERS    = 8    # NLDAS parallel downloads
 PRISM_SLEEP_SEC = 2.0   # NACSE rate-limit cushion
 
 # -------------------- Earthdata session helpers --------------------
