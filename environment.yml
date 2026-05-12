@@ -4,10 +4,14 @@ channels:
 dependencies:
   - python>=3.10,<3.13
   - numpy
-  - scipy
   - netcdf4
   - gdal
-  - pyproj
-  - pillow
-  - python-dateutil
   - pip
+  - scipy
+  - pyproj
+  - python-dateutil
+  - pillow
+  - ipykernel
+  - requests
+  - tqdm
+  - libgdal-netcdf

@@ -1,7 +1,9 @@
-# GDAL via pip needs the system libgdal-dev installed first, and the
-# pip GDAL version must match the system libgdal version exactly.
-# pyproj also depends on system PROJ. If install fails, use environment.yml
-# with conda instead — it handles the C-library side cleanly.
+# GDAL via pip needs the system libgdal-dev installed first (with NetCDF
+# driver enabled), and the pip GDAL version must match the system
+# libgdal version exactly. pyproj also depends on system PROJ. If install
+# fails, use environment.yml with conda instead — it handles the
+# C-library side cleanly (including the libgdal-netcdf split package,
+# which has no pip equivalent).
 numpy
 scipy
 netCDF4
@@ -9,3 +11,6 @@ GDAL
 pyproj
 Pillow
 python-dateutil
+requests
+tqdm
+ipykernel
