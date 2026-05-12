@@ -1,8 +1,19 @@
 import sys
 import os
-sys.path.insert(1, 'ProgramFiles')
+from pathlib import Path
+
+# Add the SnowPALM_model directory (sibling of this script's parent) to sys.path
+if "__file__" in globals():
+    current_file_dir = Path(__file__).resolve().parent
+target_path = current_file_dir.parent / "SnowPALM_model"
+if target_path.exists() and str(target_path) not in sys.path:
+    sys.path.insert(1, str(target_path))
+else:
+    print(f"Path already in sys.path or directory not found: {target_path}")
+
 import dateutil.parser
 import Output
+print(f"Using Output from: {Output.__file__}")
 program_pars = {}
 
 # Simulation Parameters
@@ -10,7 +21,7 @@ program_pars = {}
 program_pars['SimulationName'] = sys.argv[1]        # Name of simulation
 program_pars['Verbose'] = False                     # Verbose Output
 
-program_pars['NProcesses'] = 60
+program_pars['NProcesses'] = 8     # Match your CPU core count; bump up on a beefy VM
 
 StartDate_str = sys.argv[2]
 EndDate_str = sys.argv[3]
