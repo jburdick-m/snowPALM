@@ -17,6 +17,29 @@ import time
 nodataval = -9999
 
 
+def _interp2d_linear(x, y, z):
+    """Drop-in replacement for the deprecated scipy.interpolate.interp2d
+    with kind='linear'. SciPy removed interp2d in 1.14.
+
+    Expects x and y as 1D ascending arrays and z shape (len(y), len(x)).
+    Returns a callable f(x_new, y_new) matching the old interp2d call
+    convention -- f(x_arr, y_arr) gives a 2D result shape
+    (len(y_arr), len(x_arr)); scalar inputs give a 1x1 array.
+    """
+    rgi = interpolate.RegularGridInterpolator(
+        (y, x), z, method='linear', bounds_error=False, fill_value=None
+    )
+
+    def evaluator(x_new, y_new):
+        x_arr = np.atleast_1d(x_new)
+        y_arr = np.atleast_1d(y_new)
+        xx, yy = np.meshgrid(x_arr, y_arr)
+        pts = np.stack([yy.ravel(), xx.ravel()], axis=-1)
+        return rgi(pts).reshape(yy.shape)
+
+    return evaluator
+
+
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
         yield start_date + timedelta(n)
@@ -402,7 +425,7 @@ def interp_forcing_data(TileName,FName,Locs,nt,nd,te,tr,pars):
                 if Data.shape[0] == 24 and pars['ModelTimestep'] == 0:
                     for i in range(24):
                         Data_sub = Data[i,:,:]
-                        f = interpolate.interp2d(x, y, np.flipud(Data_sub), kind='linear')
+                        f = _interp2d_linear(x, y, np.flipud(Data_sub))
                            
                         if pars['SimulationType'] == 2:
                             if pars['POIForcingInterpMethod'] == 0:
@@ -422,7 +445,7 @@ def interp_forcing_data(TileName,FName,Locs,nt,nd,te,tr,pars):
                     else:
                         Data_sub = np.mean(Data, axis=0)
                     
-                    f = interpolate.interp2d(x, y, np.flipud(Data_sub), kind='linear')
+                    f = _interp2d_linear(x, y, np.flipud(Data_sub))
                     if pars['SimulationType'] == 2:
                         if pars['POIForcingInterpMethod'] == 0:
                             interp_vals = np.zeros(xxi_sub.shape) * np.nan
@@ -437,7 +460,7 @@ def interp_forcing_data(TileName,FName,Locs,nt,nd,te,tr,pars):
                         
                 elif Data.shape[0] == 1 and pars['ModelTimestep'] == 1:
                 
-                    f = interpolate.interp2d(x, y, np.flipud(Data[0,:,:]), kind='linear')
+                    f = _interp2d_linear(x, y, np.flipud(Data[0,:,:]))
                     if pars['SimulationType'] == 2:
                         if pars['POIForcingInterpMethod'] == 0:
                             interp_vals = np.zeros(xxi_sub.shape) * np.nan
