@@ -1,5 +1,6 @@
 import sys, os
 import subprocess
+import concurrent.futures
 from datetime import date, datetime,timedelta
 from osgeo import gdal, osr
 from osgeo.gdalconst import *
@@ -67,6 +68,12 @@ def _read_nldas_netcdf(fname, tr, te, prj, resampling_method, tmp_dir, Verbose):
     """Read an NLDAS-2 v2.0 NetCDF (.nc) hourly file and return a
     (11, rows, cols) float array with the band ordering above.
 
+    Speed optimizations:
+    - The 9 variable warps run concurrently in a ThreadPoolExecutor; gdal.Warp
+      releases the GIL during the C-level warp so threads run in parallel.
+    - Outputs go to GDAL's /vsimem/ in-memory filesystem instead of disk temp
+      files, skipping the write/read round-trip.
+
     Precip (Rainf) is converted from kg/m^2/s -> kg/m^2/hr (mm/hr) so it
     matches what the old GRIB APCP delivered. PotEvap stays in NetCDF
     units (W/m^2)."""
@@ -78,44 +85,40 @@ def _read_nldas_netcdf(fname, tr, te, prj, resampling_method, tmp_dir, Verbose):
     ulx, lry, lrx, uly = (float(v) for v in te.split())
     xres, yres = (float(v) for v in tr.split())
 
-    # Read one variable just to learn the output grid shape.
-    first_tmp = os.path.join(tmp_dir, 'tmp_NLDAS_probe.tif')
-    gdal.Warp(
-        first_tmp, f'NETCDF:"{fname}":Tair',
-        format='GTiff',
-        xRes=abs(xres), yRes=abs(yres),
-        outputBounds=[ulx, lry, lrx, uly],
-        dstSRS=prj,
-        resampleAlg=resampling_method,
-        multithread=True,
-    )
-    first_band = ReadRaster(first_tmp, Verbose)
-    if first_band.ndim == 3:
-        first_band = first_band[0]
-    rows, cols = first_band.shape
+    tasks = [(i, v) for i, v in enumerate(_NLDAS_VAR_ORDER) if v is not None]
 
-    data = np.zeros((11, rows, cols)) * np.nan
-    data[0, :, :] = first_band
-    os.remove(first_tmp)
-
-    for band_idx, varname in enumerate(_NLDAS_VAR_ORDER):
-        if varname is None or band_idx == 0:
-            continue
-        tmp = os.path.join(tmp_dir, f'tmp_NLDAS_{varname}.tif')
+    def _warp_one(task):
+        band_idx, varname = task
+        # Unique /vsimem/ path per (varname, fname-basename) so concurrent calls
+        # from outer parallelism (if any) don't collide.
+        mem_path = f'/vsimem/NLDAS_{os.path.basename(fname)}_{varname}.tif'
         gdal.Warp(
-            tmp, f'NETCDF:"{fname}":{varname}',
+            mem_path, f'NETCDF:"{fname}":{varname}',
             format='GTiff',
             xRes=abs(xres), yRes=abs(yres),
             outputBounds=[ulx, lry, lrx, uly],
             dstSRS=prj,
             resampleAlg=resampling_method,
-            multithread=True,
+            # Don't use gdal.Warp internal multithreading -- we already run 9
+            # warps in parallel above. Internal threading on top would over-
+            # subscribe CPU cores.
+            multithread=False,
         )
-        band = ReadRaster(tmp, Verbose)
+        band = ReadRaster(mem_path, Verbose)
+        gdal.Unlink(mem_path)
         if band.ndim == 3:
             band = band[0]
+        return band_idx, band
+
+    results = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(tasks)) as ex:
+        for band_idx, band in ex.map(_warp_one, tasks):
+            results[band_idx] = band
+
+    rows, cols = next(iter(results.values())).shape
+    data = np.zeros((11, rows, cols)) * np.nan
+    for band_idx, band in results.items():
         data[band_idx, :, :] = band
-        os.remove(tmp)
 
     # kg/m^2/s -> kg/m^2/hr (i.e. mm/hr) to match old GRIB APCP
     data[9, :, :] = data[9, :, :] * 3600.0
