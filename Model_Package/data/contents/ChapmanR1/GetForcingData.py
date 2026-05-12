@@ -21,7 +21,7 @@ pars['Verbose'] = False                                # Verbose output
 #pars['GriddedForcingDir'] = r'Z:\GriddedForcing'  # Directory containing gridded forcing data
 
 #pars['GriddedForcingDir'] = '../../GriddedForcing'     # Directory containing gridded forcing data
-pars['GriddedForcingDir'] = r'C:\Users\jburdick\Documents\Python Scripts\git\snowPALM\GriddedForcing'     # Directory containing gridded forcing data
+pars['GriddedForcingDir'] = str(Path(__file__).resolve().parents[4] / 'GriddedForcing')   # Directory containing gridded forcing data (resolved relative to this script: ChapmanR1 -> contents -> data -> Model_Package -> repo root)
 
 #    'GriddedForcing'     # Directory containing gridded forcing data
 

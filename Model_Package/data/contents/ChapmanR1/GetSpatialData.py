@@ -29,17 +29,17 @@ pars['VegCoverCategories'] = [[80, 100], [60, 80], [40, 60], [20, 40], [0, 20]]
 pars['Transmittances'] = [0.1, 0.3, 0.5, 0.7, 0.9]                                     
 pars['CanopyTransFactor'] = 0.5                                                 # Canopy transmission coefficient
 
-pars['GISDir'] = os.getcwd() + '\\Preprocess\\GIS'        # GIS Directory
-pars['IndexDir'] = os.getcwd() + '\\Preprocess\\'  # GIS Directory
+pars['GISDir'] = os.getcwd() + '/Preprocess/GIS'        # GIS Directory
+pars['IndexDir'] = os.getcwd() + '/Preprocess/'  # GIS Directory
 
 #################### Get Spatial Data ####################
 
 # Elevation raster to get data from
-pars['DTM_File'] = r'InputData\SpatialData\chapman_DEM.tif'
+pars['DTM_File'] = 'InputData/SpatialData/chapman_DEM.tif'
 # Canopy height raster to get data from
-pars['VegHT_File'] = r'InputData\SpatialData\chapman_CHM_1point5m.tif'
+pars['VegHT_File'] = 'InputData/SpatialData/chapman_CHM_1point5m.tif'
 # Canopy cover raster to get data from
-pars['VegCover_File'] = r'InputData\SpatialData\chapman_CC_1point5m.tif'
+pars['VegCover_File'] = 'InputData/SpatialData/chapman_CC_1point5m.tif'
 # Cutline file to clip out shape (will only be used if pars['Cutline_File'] is not an empty string)
 pars['Cutline_File'] = ''
 

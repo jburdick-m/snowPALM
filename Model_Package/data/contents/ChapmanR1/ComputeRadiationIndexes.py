@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 import os
+import shutil
 #add SnowPALM_model dir to path
 if "__file__" in globals():
     current_file_dir = Path(__file__).resolve().parent
@@ -23,7 +24,8 @@ pars = {}
 pars['Verbose'] = False                          # Verbose output
 pars['Overwrite'] = True                        # Overwrite Files?
 pars['CreatePyramids'] = False                   # Create pyramids for faster display
-pars['SagaGISLoc'] = "C:\\Users\\jburdick\\saga-9.12.2_msw"        # Location of Saga GIS Executable
+_saga = shutil.which('saga_cmd')
+pars['SagaGISLoc'] = os.path.dirname(_saga) if _saga else "C:\\Users\\jburdick\\saga-9.12.2_msw"   # Location of Saga GIS Executable (auto-detect on PATH; falls back to Windows install)
 
 # Compute all indexes for different classes individually, and adjust indexes according to canopy thickness (move to separate program)
 pars['VegCoverCategories'] = [[80, 100], [60, 80], [40, 60], [20, 40], [0, 20]] 

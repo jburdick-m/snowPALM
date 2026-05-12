@@ -26,6 +26,7 @@ Run from inside the ChapmanR1 folder:
 
 import sys
 import os
+import shutil
 import concurrent.futures
 from pathlib import Path
 
@@ -56,7 +57,8 @@ pars = {}
 pars['Verbose']         = False
 pars['Overwrite']       = True
 pars['CreatePyramids']  = False
-pars['SagaGISLoc']      = "C:\\Users\\jburdick\\saga-9.12.2_msw"
+_saga = shutil.which('saga_cmd')
+pars['SagaGISLoc']      = os.path.dirname(_saga) if _saga else "C:\\Users\\jburdick\\saga-9.12.2_msw"   # auto-detect on PATH; Windows fallback
 
 pars['MaxParallelSagaJobs'] = 16    # Cap on concurrent SAGA processes
 
