@@ -74,9 +74,10 @@ def _read_nldas_netcdf(fname, tr, te, prj, resampling_method, tmp_dir, Verbose):
     - Outputs go to GDAL's /vsimem/ in-memory filesystem instead of disk temp
       files, skipping the write/read round-trip.
 
-    Precip (Rainf) is converted from kg/m^2/s -> kg/m^2/hr (mm/hr) so it
-    matches what the old GRIB APCP delivered. PotEvap stays in NetCDF
-    units (W/m^2)."""
+    Units: NLDAS-2 v2.0 NetCDF Rainf is "kg m-2" (mm accumulated in the
+    hour) -- the same convention as the old GRIB-1 APCP. No conversion
+    required; we read it through as-is. PotEvap stays in NetCDF units
+    (W/m^2)."""
 
     if not os.path.exists(fname):
         print('Could not open ' + fname)
@@ -120,8 +121,8 @@ def _read_nldas_netcdf(fname, tr, te, prj, resampling_method, tmp_dir, Verbose):
     for band_idx, band in results.items():
         data[band_idx, :, :] = band
 
-    # kg/m^2/s -> kg/m^2/hr (i.e. mm/hr) to match old GRIB APCP
-    data[9, :, :] = data[9, :, :] * 3600.0
+    # Rainf is already in kg/m^2 accumulated over the hour (= mm/hr),
+    # same as the old GRIB-1 APCP. No conversion needed.
     return data
 
 def GetGeorefInfo(fname):
