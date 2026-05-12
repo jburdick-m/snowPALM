@@ -252,6 +252,16 @@ elif program_pars['SimulationName'] == 'ChapmanR1_WY2025_Daily':
     program_pars['MaxChunkSize'] = 25000                            # Maximum size (in pixels) of each model chunk
     program_pars['UseWindModel'] = True
 
+elif program_pars['SimulationName'] == 'ChapmanR1_WY2025_Dec_test':
+    program_pars['ForcingSetName'] = 'DailyNLDASData2'
+    program_pars['ModelTimestep'] = 1
+    program_pars['UseHourlySFIFiles'] = False
+    program_pars['StartDate'] = date(2024, 12, 1)
+    program_pars['EndDate']   = date(2024, 12, 31)
+    program_pars['SimulationType'] = 0
+    program_pars['MaxChunkSize'] = 25000
+    program_pars['UseWindModel'] = True
+
 # Output Variables
 #                            Variable Name                      Short Name (in code)    Units
 program_pars['OutVars'] = [ ['Air Temperature',                 'airt',                 'C',            ],
