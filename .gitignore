@@ -1,20 +1,21 @@
-  # Ignore everything by default
-  *
+# Ignore everything by default
+*
 
-  # Re-include directories so git can recurse into them
-  !*/
+# Re-include directories so git can recurse into them
+!*/
 
-  # Allow these file types
-  !*.py
-  !*.txt
+# Allow these file types
+!*.py
+!*.txt
+!*.md
 
-  # Allow .gitignore itself
-  !.gitignore
+# Allow .gitignore itself
+!.gitignore
 
-  # Belt and suspenders: never track credentials even if they slip through
-  *.local
-  *.secret
-  credentials*
-  *token*.txt
-  *.pem
-  *.key
+# Belt and suspenders: never track credentials even if they slip through
+*.local
+*.secret
+credentials*
+*token*.txt
+*.pem
+*.key
