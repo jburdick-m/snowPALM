@@ -623,7 +623,7 @@ def interp_indexes(TileName,FName,Locs,nt,nd,te,tr,pars):
         Data = ReadRaster(ofname, pars['Verbose'])
         OutVars['Elev'] = Data[Locs]
         
-        ifname = pars['IndexDir'] + '/Skyview.tif'
+        ifname = pars['IndexDir'] + '/SkyView.tif'
         ofname = tmp_dir.name + '/tmp_index.tif'
         if pars['Verbose']:
             print('Reading ' + ifname + ' for ' + TileName)
@@ -658,7 +658,7 @@ def interp_indexes(TileName,FName,Locs,nt,nd,te,tr,pars):
                         for i in range(24):
                             OutVars['LWI'][d*24+i,:] = Data[Locs]
                 
-                    ifname = pars['IndexDir'] + '/SFI/Daily/' + mm + '-' + dd + '_direct_UnderCanopy.tif'
+                    ifname = pars['IndexDir'] + '/SFI/Daily/' + mm + '-' + dd + '_direct_underCanopy.tif'
                     ofname = tmp_dir.name + '/tmp_index.tif'
                     if pars['Verbose']:
                         print('Reading ' + ifname + ' for ' + TileName)
@@ -671,7 +671,7 @@ def interp_indexes(TileName,FName,Locs,nt,nd,te,tr,pars):
                         for i in range(24):
                             OutVars['SFI_Direct_UnderCanopy'][d*24+i,:] = Data[Locs]
 
-                    ifname = pars['IndexDir'] + '/SFI/Daily/' + mm + '-' + dd + '_diffuse_UnderCanopy.tif'
+                    ifname = pars['IndexDir'] + '/SFI/Daily/' + mm + '-' + dd + '_diffuse_underCanopy.tif'
                     ofname = tmp_dir.name + '/tmp_index.tif'
                     if pars['Verbose']:
                         print('Reading ' + ifname + ' for ' + TileName)
@@ -684,7 +684,7 @@ def interp_indexes(TileName,FName,Locs,nt,nd,te,tr,pars):
                         for i in range(24):
                             OutVars['SFI_Diffuse_UnderCanopy'][d*24+i,:] = Data[Locs]
                     
-                    ifname = pars['IndexDir'] + '/SFI/Daily/' + mm + '-' + dd + '_direct_NoVeg.tif'
+                    ifname = pars['IndexDir'] + '/SFI/Daily/' + mm + '-' + dd + '_direct_noVeg.tif'
                     ofname = tmp_dir.name + '/tmp_index.tif'
                     if pars['Verbose']:
                         print('Reading ' + ifname)
@@ -697,7 +697,7 @@ def interp_indexes(TileName,FName,Locs,nt,nd,te,tr,pars):
                         for i in range(24):
                             OutVars['SFI_Direct_NoVeg'][d*24+i,:] = Data[Locs]
                     
-                    ifname = pars['IndexDir'] + '/SFI/Daily/' + mm + '-' + dd + '_diffuse_NoVeg.tif'
+                    ifname = pars['IndexDir'] + '/SFI/Daily/' + mm + '-' + dd + '_diffuse_noVeg.tif'
                     ofname = tmp_dir.name + '/tmp_index.tif'
                     if pars['Verbose']:
                         print('Reading ' + ifname + ' for ' + TileName)
@@ -730,7 +730,7 @@ def interp_indexes(TileName,FName,Locs,nt,nd,te,tr,pars):
                         Data[np.isnan(Data)] = 0
                         OutVars['LWI'][d*24+hour,:] = Data[Locs]
                             
-                        ifname = pars['IndexDir'] + '/SFI/Hourly/' + mm + '-' + dd + '/' + hh + '_direct_UnderCanopy.tif'
+                        ifname = pars['IndexDir'] + '/SFI/Hourly/' + mm + '-' + dd + '/' + hh + '_direct_underCanopy.tif'
                         ofname = tmp_dir.name + '/tmp_index.tif'
                         if pars['Verbose']:
                             print('Reading ' + ifname + ' for ' + TileName)
@@ -740,7 +740,7 @@ def interp_indexes(TileName,FName,Locs,nt,nd,te,tr,pars):
                         Data[np.isnan(Data)] = 0
                         OutVars['SFI_Direct_UnderCanopy'][d*24+hour,:] = Data[Locs]
 
-                        ifname = pars['IndexDir'] + '/SFI/Hourly/' + mm + '-' + dd + '/' + hh + '_diffuse_UnderCanopy.tif'
+                        ifname = pars['IndexDir'] + '/SFI/Hourly/' + mm + '-' + dd + '/' + hh + '_diffuse_underCanopy.tif'
                         ofname = tmp_dir.name + '/tmp_index.tif'
                         if pars['Verbose']:
                             print('Reading ' + ifname + ' for ' + TileName)
@@ -750,7 +750,7 @@ def interp_indexes(TileName,FName,Locs,nt,nd,te,tr,pars):
                         Data[np.isnan(Data)] = 0
                         OutVars['SFI_Diffuse_UnderCanopy'][d*24+hour,:] = Data[Locs]
                         
-                        ifname = pars['IndexDir'] + '/SFI/Hourly/' + mm + '-' + dd + '/' + hh + '_direct_NoVeg.tif'
+                        ifname = pars['IndexDir'] + '/SFI/Hourly/' + mm + '-' + dd + '/' + hh + '_direct_noVeg.tif'
                         ofname = tmp_dir.name + '/tmp_index.tif'
                         if pars['Verbose']:
                             print('Reading ' + ifname + ' for ' + TileName)
@@ -760,7 +760,7 @@ def interp_indexes(TileName,FName,Locs,nt,nd,te,tr,pars):
                         Data[np.isnan(Data)] = 0
                         OutVars['SFI_Direct_NoVeg'][d*24+hour,:] = Data[Locs]
                         
-                        ifname = pars['IndexDir'] + '/SFI/Hourly/' + mm + '-' + dd + '/' + hh + '_diffuse_NoVeg.tif'
+                        ifname = pars['IndexDir'] + '/SFI/Hourly/' + mm + '-' + dd + '/' + hh + '_diffuse_noVeg.tif'
                         ofname = tmp_dir.name + '/tmp_index.tif'
                         if pars['Verbose']:
                             print('Reading ' + ifname + ' for ' + TileName)
