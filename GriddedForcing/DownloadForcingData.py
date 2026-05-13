@@ -272,6 +272,46 @@ def download_nldas(session):
             print(f"    ... and {len(errors) - 10} more")
 
 
+# -------------------- US_DEM --------------------
+
+ETOPO_URL = ("https://www.ngdc.noaa.gov/thredds/fileServer/global/"
+             "ETOPO2022/60s/60s_surface_elev_netcdf/"
+             "ETOPO_2022_v1_60s_N90W180_surface.nc")
+# CONUS bounds: -125 to -65 lon, 24 to 50 lat
+CONUS_BOUNDS = (-125.0, 50.0, -65.0, 24.0)   # ulx, uly, lrx, lry
+
+
+def download_us_dem():
+    """Download a CONUS elevation grid as US_DEM.tif. Used by Forcing.py
+    PRISM lapse-rate computation. Skipped if file already exists."""
+    out = Path("US_DEM.tif")
+    if out.exists() and out.stat().st_size > 0:
+        print(f">>> US_DEM.tif already present ({out.stat().st_size // (1024*1024)} MB) -- skipping")
+        return
+
+    print(">>> US_DEM (CONUS elevation from ETOPO 2022 60s)")
+    src_nc = Path("etopo_global.nc")
+    print(f"  downloading {ETOPO_URL.split('/')[-1]} (~480 MB; one-time)")
+    s = requests.Session()
+    with s.get(ETOPO_URL, stream=True, timeout=300) as r:
+        r.raise_for_status()
+        with open(src_nc, "wb") as f:
+            for chunk in r.iter_content(1024 * 1024):
+                if chunk:
+                    f.write(chunk)
+    print(f"  clipping to CONUS and writing {out}")
+    from osgeo import gdal
+    gdal.Translate(
+        str(out), str(src_nc),
+        format="GTiff",
+        projWin=list(CONUS_BOUNDS),
+        projWinSRS="EPSG:4326",
+        creationOptions=["COMPRESS=DEFLATE"],
+    )
+    src_nc.unlink()
+    print(f"  ok    {out} ({out.stat().st_size // (1024*1024)} MB)")
+
+
 # -------------------- Main --------------------
 
 def main():
@@ -286,6 +326,7 @@ def main():
 
     download_prism(_make_prism_session())
     download_nldas(_make_nldas_session())
+    download_us_dem()
 
     print(f"Done in {time.time() - t0:.0f} s.")
 

@@ -512,18 +512,24 @@ def GetForcingData(pars):
 
                 if 'PRISM_DTM' not in locals():
 
-                    fname = pars['PRISMForcingDir'] + '/../US_DEM.tif'
+                    # Use string-level dirname instead of '/..' traversal so this still works
+                    # when PRISMForcingDir is itself a symlinked path (OS follows the symlink
+                    # before resolving '..', which would skip out of the intended tree).
+                    fname = os.path.dirname(pars['PRISMForcingDir'].rstrip('/')) + '/US_DEM.tif'
+                    if not os.path.exists(fname):
+                        print(fname + ' not found!!! Run DownloadForcingData.py to fetch the CONUS elevation grid.')
+                        sys.exit(1)
 
                     rows_prism,cols_prism,ulx_prism,uly_prism,lrx_prism,lry_prism,pixelWidth_prism,pixelHeight_prism,prj_prism,wkt_prism = GetGeorefInfo(tmpfilename)
                     te_prism = str(ulx_prism) + ' ' + str(lry_prism) + ' ' + str(lrx_prism) + ' ' + str(uly_prism)
                     tr_prism = str(pixelWidth_prism) + ' ' + str(pixelHeight_prism)
-                    
+
                     cmd = 'gdalwarp -tr ' + tr_prism + ' -te ' + te_prism + ' -multi -r bilinear -overwrite -t_srs "' + prj_prism + '" "' + fname + '" "' + tmpfilename + '"'
 
                     exec_cmd(cmd, pars['Verbose'])
                     PRISM_DTM = ReadRaster(tmpfilename, pars['Verbose'])
                     DTM = ReadRaster(pars['LoResDTMFile'], pars['Verbose'])
-            
+
                 M = np.zeros(PRISM_DTM.shape) * np.nan;
                 B = np.zeros(PRISM_DTM.shape) * np.nan;
                 R = np.tile(np.reshape(range(rows_prism), (-1,1)), [1, cols_prism]);
@@ -591,7 +597,11 @@ def GetForcingData(pars):
                   
                 if 'PRISM_DTM' not in locals():
 
-                    fname = pars['PRISMForcingDir'] + '/../US_DEM.tif'
+                    # See note above re: dirname vs '/..' traversal (PRISMForcingDir may be a symlink).
+                    fname = os.path.dirname(pars['PRISMForcingDir'].rstrip('/')) + '/US_DEM.tif'
+                    if not os.path.exists(fname):
+                        print(fname + ' not found!!! Run DownloadForcingData.py to fetch the CONUS elevation grid.')
+                        sys.exit(1)
 
                     rows_prism,cols_prism,ulx_prism,uly_prism,lrx_prism,lry_prism,pixelWidth_prism,pixelHeight_prism,prj_prism = GetGeorefInfo(tmpfilename)
                     te_prism = str(ulx_prism) + ' ' + str(lry_prism) + ' ' + str(lrx_prism) + ' ' + str(uly_prism)
