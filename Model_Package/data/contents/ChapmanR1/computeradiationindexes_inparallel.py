@@ -60,7 +60,7 @@ pars['CreatePyramids']  = False
 _saga = shutil.which('saga_cmd')
 pars['SagaGISLoc']      = os.path.dirname(_saga) if _saga else "C:\\Users\\jburdick\\saga-9.12.2_msw"   # auto-detect on PATH; Windows fallback
 
-pars['MaxParallelSagaJobs'] = 16    # Cap on concurrent SAGA processes
+pars['MaxParallelSagaJobs'] = 2     # Cap on concurrent SAGA processes (each SAGA call is multi-threaded; running too many in parallel causes CPU contention)
 
 pars['VegCoverCategories'] = [[80, 100], [60, 80], [40, 60], [20, 40], [0, 20]]
 pars['Transmittances']     = [0.1, 0.3, 0.5, 0.7, 0.9]
