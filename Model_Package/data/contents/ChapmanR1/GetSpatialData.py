@@ -29,8 +29,8 @@ pars['VegCoverCategories'] = [[80, 100], [60, 80], [40, 60], [20, 40], [0, 20]]
 pars['Transmittances'] = [0.1, 0.3, 0.5, 0.7, 0.9]                                     
 pars['CanopyTransFactor'] = 0.5                                                 # Canopy transmission coefficient
 
-pars['GISDir'] = os.getcwd() + '/Preprocess/GIS'        # GIS Directory
-pars['IndexDir'] = os.getcwd() + '/Preprocess/'  # GIS Directory
+pars['GISDir'] = os.getcwd() + '/Preprocess/GIS'             # GIS Directory
+pars['IndexDir'] = os.getcwd() + '/Preprocess/Indexes'       # Index Directory (must match Compute*Indexes.py and RunModel.py)
 
 #################### Get Spatial Data ####################
 
