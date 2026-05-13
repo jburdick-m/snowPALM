@@ -98,6 +98,7 @@ def _read_nldas_netcdf(fname, tr, te, prj, resampling_method, tmp_dir, Verbose):
             format='GTiff',
             xRes=abs(xres), yRes=abs(yres),
             outputBounds=[ulx, lry, lrx, uly],
+            srcSRS='EPSG:4326',   # NLDAS NetCDF lacks embedded CRS; without this, warp to non-4326 dstSRS produces all-nodata
             dstSRS=prj,
             resampleAlg=resampling_method,
             # Don't use gdal.Warp internal multithreading -- we already run 9
