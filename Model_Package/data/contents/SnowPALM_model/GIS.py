@@ -68,7 +68,7 @@ def exec_cmd(cmd, Verbose):
 
         subprocess.call(cmd, shell=True)
     else:
-        subprocess.call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        subprocess.call(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
 
 def GetSpatialData(pars):
